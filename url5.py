@@ -1,4 +1,5 @@
 # coding:utf-8
+from time import time
 from bs4 import BeautifulSoup
 import requests
 import sys
