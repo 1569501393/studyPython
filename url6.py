@@ -6,6 +6,29 @@
 from bs4 import BeautifulSoup
 import requests
 
+rel_soup = BeautifulSoup('<p>Back to the <a rel="index">homepage hello world < br > 办事指南</a></p>')
+# rel_soup = BeautifulSoup('< a target="_blank" title="集成电路布图设计登记审批办事指南" href="/attach/0/d4b9c91154c041a49e7ad653bbfa0cc2.pdf" > <img src="/picture/0/2006101457034528487.png" alt="" > 集成电路布图设计登记审批 < br > 办事指南 < /a >')
+
+
+# rel_soup.a['rel']
+# ['index']
+# rel_soup.a['rel'] = ['index', 'contents']
+print("rel_soup.p==")
+print(rel_soup.p)
+print("内容==")
+print(rel_soup.a.contents)
+print(type(rel_soup.a.contents),  ''.join(rel_soup.a.contents))
+
+
+
+
+a =1
+print(type(a))
+
+exit()
+# <p>Back to the <a rel="index contents">homepage</a></p>
+
+
 # ➜  studyPython git: (master) ✗ python3 ./url3.py(1s)[21:09:44]
 # []
 # []
@@ -25,12 +48,12 @@ url = 'https://www.cnipa.gov.cn/'
 # url = 'http://www.adjyc.com'
 
 
-
 # 获取字符串格式的html_doc。由于content为bytes类型，故需要decode()
 # html_doc = requests.get('https://xkcd.com/353/').content.decode()
 # 加 headers
 # headers = {'user-agent': 'my-app/0.0.1'}
-headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
+headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
 
 html_doc = requests.get(url, headers=headers).content.decode()
 # 使用BeautifulSoup模块对页面文件进行解析
@@ -40,32 +63,5 @@ soup = BeautifulSoup(html_doc, 'html.parser')
 
 # 查找所有tag为'a'的html元素，并生成列表
 # links = soup.find_all('a')
-links = soup.find_all('a')
-
-# links = soup.find_all('a target')
-print("links==")
-print(links)
-
-# 获取每个元素中'href'键对应的键值--即URL，并放入url_lst
-url_lst = []
-for item in links:
-    # print("title==" + item.find('a').get_text())
-    print("content==" )
-    print(item.contents)
-    url = item.get('href')
-    print("url==")
-    print(url)
-    url_lst.append(url)
-
-# 含有 None	
-# print(url_lst, filter(lambda url_str: 'http' in url_str, url_lst), list(filter(None, url_lst)))
-# 过滤url_lst--仅保留包含http的URL
-
-#使用filter()函数，删除列表中的None值
-url_lst = list(filter(None, url_lst))
-
-# print(url_lst)
-# url_lst = list(filter(lambda url_str: 'http' in url_str, url_lst))
-url_lst = list(filter(lambda url_str: 'title' in url_str, url_lst))
-print("url_lst==")
-print(url_lst)
+link = soup.find('a').contents
+print(link)
