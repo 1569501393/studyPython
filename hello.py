@@ -17,8 +17,8 @@ time = time.time()
 print ("time=", time)
 
 # 函数
-def printStr(str):
-	print str
-	return
+# def printStr(str):
+# 	print str
+# 	return
 
-printStr("abc")	
+# printStr("abc")	
