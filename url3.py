@@ -56,7 +56,7 @@ url_lst = []
 # todo 递归
 
 # time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-file_name = 'link_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
+file_name = './storage/link_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
 with open(file_name, 'w', newline='') as csvfile:
     fieldnames = ['link', 'text', 'page_where_found', 'server_response']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
