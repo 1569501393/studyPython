@@ -9,10 +9,6 @@ import time  # 引入time模块
 from bs4 import BeautifulSoup
 import requests
 
-# ➜  studyPython git: (master) ✗ python3 ./url3.py(1s)[21:09:44]
-# []
-# []
-# url = 'http://baidu.com'
 
 # ➜  studyPython git: (master) ✗ python3 ./url3.py(1s)[21:08:48]
 # [ < a href = "/archive" > Archive < /a > , < a href = "https://what-if.xkcd.com" > What If?< /a > , < a href = "https://blag.xkcd.com" > Blag < /a > , < a href = "/about" rel = "author" > About < /a > , < a href = "/atom.xml" > Feed < /a >
@@ -27,6 +23,29 @@ url = 'https://www.cnipa.gov.cn/'
 
 # url = 'http://www.adjyc.com'
 
+# 获取状态码
+def getHttpStatusCode(url):
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
+    try:
+        request = requests.get(url, headers=headers)
+        httpStatusCode = request.status_code
+        return httpStatusCode
+    except requests.exceptions.HTTPError as e:
+        return e
+
+
+# 检测字符串是否url
+# startswith(substr, beg=0, end=len(string))
+def checkIsUrl(str):
+    return str.startswith("http")
+
+# 返回 url
+def returnUrl(str):
+    if checkIsUrl(str):
+        return str
+    else:
+        return 'https://www.cnipa.gov.cn/' + str
 
 # 获取字符串格式的html_doc。由于content为bytes类型，故需要decode()
 # html_doc = requests.get('https://xkcd.com/353/').content.decode()
@@ -35,7 +54,9 @@ url = 'https://www.cnipa.gov.cn/'
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
 
-html_doc = requests.get(url, headers=headers).content.decode()
+# html_doc = requests.get(url, headers=headers).content.decode()
+url_request = requests.get(url, headers=headers)
+html_doc = url_request.content.decode()
 # 使用BeautifulSoup模块对页面文件进行解析
 soup = BeautifulSoup(html_doc, 'html.parser')
 # print("soup==")
@@ -77,9 +98,18 @@ with open(file_name, 'w', newline='') as csvfile:
         # 写入 csv
         page_where_found = ''
         # todo curl
-        server_response = 404
-        writer.writerow({'link': url, 'text': content_str, 'page_where_found': page_where_found,
-                        'server_response': server_response})
+        # server_response = 404
+        
+        server_response = getHttpStatusCode(returnUrl(url))
+        
+        writer.writerow(
+            {
+                'link': url,
+                'text': content_str,
+                'page_where_found': page_where_found,
+                'server_response': server_response
+            }
+        )
 
 # 含有 None
 # print(url_lst, filter(lambda url_str: 'http' in url_str, url_lst), list(filter(None, url_lst)))
@@ -93,3 +123,6 @@ with open(file_name, 'w', newline='') as csvfile:
 # url_lst = list(filter(lambda url_str: 'title' in url_str, url_lst))
 # print("url_lst==")
 # print(url_lst)
+
+
+
