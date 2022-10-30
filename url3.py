@@ -8,6 +8,8 @@ import time  # 引入time模块
 # 导入BeautifulSoup和requests模块
 from bs4 import BeautifulSoup
 import requests
+from reptile import Reptile
+from myHtmlParser import MyHtmlParser
 
 
 # ➜  studyPython git: (master) ✗ python3 ./url3.py(1s)[21:08:48]
@@ -19,33 +21,45 @@ import requests
 # url = 'http://news.sina.com.cn/china/'
 
 # 目标站点
-url = 'https://www.cnipa.gov.cn/'
+urlTarget = 'https://www.cnipa.gov.cn/'
 
-# url = 'http://www.adjyc.com'
+# 存放还没访问的url
+url_set_not_visit = set()
 
-# 获取状态码
-def getHttpStatusCode(url):
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
-    try:
-        request = requests.get(url, headers=headers)
-        httpStatusCode = request.status_code
-        return httpStatusCode
-    except requests.exceptions.HTTPError as e:
-        return e
+# 存放已访问的url
+url_set_visited = set()  
 
 
-# 检测字符串是否url
-# startswith(substr, beg=0, end=len(string))
-def checkIsUrl(str):
-    return str.startswith("http")
+def check_dead_links(reptile, html_parser, target_url_seed_set, protocol, host, port, headers):
+    global url_set_not_visit
+    global url_set_visited
 
-# 返回 url
-def returnUrl(str):
-    if checkIsUrl(str):
-        return str
-    else:
-        return 'https://www.cnipa.gov.cn/' + str
+    # print(reptile, html_parser, target_url_seed_set, protocol, host, port, headers)
+    # exit()
+    
+    while (target_url_seed_set):
+        for url_path in target_url_seed_set:
+            # 下载页面
+            page = reptile.get_page(protocol, host, port, url_path, headers, target_url_seed_set)
+
+            # 解析网页
+            html_parser.feed(str(page))
+
+            # 获取页面url
+            url_set_on_page = html_parser.get_url_set_on_page()
+
+            #exclusion = "mod=login|card.php|archiver|mod=viewthread|[.]css|[.]js|[.]gif|.jpg|about[.]php|panel[.]php|[.]swf|search[.]php"
+            exclusion = '[.]xlsx'
+            include = ''
+
+            # 获取种子url  关联下级页面
+            target_url_seed_set_tmp = reptile.get_target_url_seed_set(url_set_on_page, include, exclusion)
+
+            url_set_not_visit = url_set_not_visit | target_url_seed_set_tmp
+
+        url_set_visited = url_set_visited | target_url_seed_set
+        target_url_seed_set = url_set_not_visit - url_set_visited
+        
 
 # 获取字符串格式的html_doc。由于content为bytes类型，故需要decode()
 # html_doc = requests.get('https://xkcd.com/353/').content.decode()
@@ -54,75 +68,27 @@ def returnUrl(str):
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
 
-# html_doc = requests.get(url, headers=headers).content.decode()
-url_request = requests.get(url, headers=headers)
-html_doc = url_request.content.decode()
-# 使用BeautifulSoup模块对页面文件进行解析
-soup = BeautifulSoup(html_doc, 'html.parser')
-# print("soup==")
-# print(soup)
+# url = 'http://www.adjyc.com'
 
-# 查找所有tag为'a'的html元素，并生成列表
-# links = soup.find_all('a')
-links = soup.find_all('a')
+# 获取状态码
+def getHttpStatusCode(url):
+    global headers
+    try:
+        request = requests.get(url, headers=headers, verify=False)
+        httpStatusCode = request.status_code
+        return httpStatusCode
+    except requests.exceptions.HTTPError as e:
+        # pass
+        return e
+        # return '443'
 
-# links = soup.find_all('a target')
-print("links==")
-print(links)
+print('正则构造html解析器')
+html_parser = MyHtmlParser()
 
-# 获取每个元素中'href'键对应的键值--即URL，并放入url_lst
-url_lst = []
+print('正则检测死链')
+reptile = Reptile()
+# check_dead_links(reptile, html_parser, set(urlTarget), 'http', 'www.cnipa.gov.cn', '80', headers)
+check_dead_links(reptile, html_parser, {urlTarget}, 'http', 'www.cnipa.gov.cn', '80', headers)
 
-# todo 去重
-# todo 递归
-
-# time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-file_name = './storage/link_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
-with open(file_name, 'w', newline='') as csvfile:
-    fieldnames = ['link', 'text', 'page_where_found', 'server_response']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
-    for item in links:
-        print("content==")
-        print(item.contents)
-        # print(''.join(item.contents))
-        # 列表转字符串
-        content_list = map(lambda x: str(x), item.contents)
-        content_str = ''.join(content_list)
-        print(content_str)
-
-        url = item.get('href')
-        print("url==")
-        print(url)
-        url_lst.append(url)
-        # 写入 csv
-        page_where_found = ''
-        # todo curl
-        # server_response = 404
-        
-        server_response = getHttpStatusCode(returnUrl(url))
-        
-        writer.writerow(
-            {
-                'link': url,
-                'text': content_str,
-                'page_where_found': page_where_found,
-                'server_response': server_response
-            }
-        )
-
-# 含有 None
-# print(url_lst, filter(lambda url_str: 'http' in url_str, url_lst), list(filter(None, url_lst)))
-# 过滤url_lst--仅保留包含http的URL
-
-# 使用filter()函数，删除列表中的None值
-# url_lst = list(filter(None, url_lst))
-
-# # print(url_lst)
-# # url_lst = list(filter(lambda url_str: 'http' in url_str, url_lst))
-# url_lst = list(filter(lambda url_str: 'title' in url_str, url_lst))
-# print("url_lst==")
-# print(url_lst)
-
-
-
+# 释放资源
+reptile.closefile()

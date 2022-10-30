@@ -14,9 +14,9 @@ cj = http.cookiejar.CookieJar()
 cookie_handler = urllib.request.HTTPCookieProcessor(cj)
 
 # 添加ssl支持 # 注意，发起的请求要为443端口
-https_sslv3_handler = urllib.request.HTTPSHandler(context=ssl.SSLContext(ssl.PROTOCOL_SSLv2))
-opener = urllib.request.build_opener(cookie_handler, https_sslv3_handler)
-urllib.request.install_opener(opener)
+# https_sslv3_handler = urllib.request.HTTPSHandler(context=ssl.SSLContext(ssl.PROTOCOL_SSLv2))
+# opener = urllib.request.build_opener(cookie_handler, https_sslv3_handler)
+# urllib.request.install_opener(opener)
 
 class MyHttp:
     '''配置要测试接口服务器的ip、端口、域名等信息，封装http请求方法，http头设置'''

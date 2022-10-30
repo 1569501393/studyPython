@@ -81,7 +81,8 @@ if __name__ == '__main__':
     headers = {'User-Agent':"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0"}
 
     print('正则构造html解析器')
-    html_parser = MyHtmlParser(strict = False)
+    # html_parser = MyHtmlParser(strict=False)
+    html_parser = MyHtmlParser()
 
     reptile = Reptile()
     print('正则检测死链')
