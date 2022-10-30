@@ -1,0 +1,42 @@
+测试环境：
+win7 
+python 3.3.2
+chardet 2.3.0 
+
+脚本作用：
+检测系统中访问异常(请求返回code值非200)的链接
+
+使用方法：
+1. 配置
+编辑deadLinkDetection\conf\init.conf
+
+配置项如下
+protocol：协议，比如https, http
+host：主机、域名，如192.168.1.3
+port：端口号,比如 80， 8080， 443
+username：配置登录用户名
+password：配置登录密码
+
+2.配置种子url
+
+编辑conf/urlNoLogin.txt文件中填写不需要登录就可访问的种子url,格式如下,每行一条url路径
+/
+/doc/sadmin.html/
+/doc/refman/5.7/en/statement-optimization.html
+/doc/homepage.html
+
+
+在conf/urlNeedLogin.txt文件中填写需要登录才可访问的种子url,格式同上
+
+3. 根据项目实际情况，修改main.py中login_system函数，实现登录系统
+
+4. 运行程序
+cmd 进入到deadLinkDetection目录，运行 python main.py
+
+5. 查看运行结果
+除了控制台打印的输出，默认的，还会在d:\\目录下，生成filepath_of_urls_visited.txt, d:/filepath_of_urls_in_trouble.txt文件，
+分别存放成功访问过的url链接，和访问异常的链接，可在main.py中找到代码行“reptile = Reptile()”，显示指定要生成的文件，如下：
+reptile = Reptile('d:/xxxxx_visited.txt', 'd:/xxxxx_in_trouble.txt)
+
+使用限制：
+登录系统函数无法通用，需要自己实现
