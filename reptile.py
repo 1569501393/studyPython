@@ -7,9 +7,14 @@ import gzip
 import re
 from io import BytesIO
 import time  # 引入time模块
-from urllib.request import *
-import re
+# from urllib.request import *
+# from urllib import *
+import urllib.request
+import urllib.error
+
 import chardet
+# import requests
+
 
 # 爬虫类
 
@@ -38,23 +43,27 @@ class Reptile:
             url = protocol + '://' + host + ':' + port + url_path
         else:
             url = url_path
-        request = Request(url, headers=headers)
+        request = urllib.request.Request(url, headers=headers)
         request.add_header('Accept-encoding', 'gzip')  # 下载经过gzip方式压缩后的网页，减少网络流量
 
         # 定义 title
         title = ''
         status_code = 0
-
+        
         try:
-            print('正在访问第 %s 个链接:\n %s' % (self.page_visited_num, url))
-            response = urlopen(request)  # 发送请求报文
-            self.page_visited_num = self.page_visited_num + 1
+            print('%s, 正在访问第 %s 个链接:\n %s' % (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, url))
 
-            status_code = response.code
+            # response = urlopen(request)  # 发送请求报文
+            response = urllib.request.urlopen(request)  # 发送请求报文
+            # status_code = response.code
+            status_code = response.getcode()
+            
             # 存储已成功访问的页面url
-            self.file.write('正在访问第 %s 个链接, code: %s :\n %s' % (self.page_visited_num, status_code, url))
-            self.file.write('\n')
+            self.file.write('%s, 正在访问第 %s 个链接: code: %s \n %s' % (time.strftime(
+                "%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, status_code, url))
             self.file.flush()
+            
+            self.page_visited_num = self.page_visited_num + 1
 
             if status_code == 200:  # 请求成功
                 print('访问成功。', end=' ')
@@ -70,7 +79,8 @@ class Reptile:
                     self.data = page_data  # 网页未采用gzip方式压缩，使用原页面
 
                 encoding = chardet.detect(self.data)['encoding']
-                # print('正在对服务器返回body进行解码')
+                print('正在对服务器返回body进行解码')
+                print(encoding)
 
                 if encoding:
                     if encoding.lower() in ('gb2312', 'windows-1252', 'iso-8859-2', 'iso-8859-1'):
@@ -86,6 +96,7 @@ class Reptile:
                         self.file.write('\n')
                         self.file.flush()
                         pass
+                
                 result = re.findall("<title>(.+?)</title>", str(self.data))
                 if result:
                     title = result[0]
@@ -103,8 +114,15 @@ class Reptile:
                 self.file.write('URL：' + url + ' 访问链接 %s 失败' % url)
                 self.file.write('\n')
                 self.file.flush()
-        except Exception as e:
+        # except Exception as e:
+        except urllib.error.HTTPError as e:
+        # except request as e:
             pass
+            self.page_visited_num = self.page_visited_num + 1
+            status_code = e.code
+            # print("111")
+            # print(str(e))
+            # exit()
             print('解析页面出错\n')
             # 存储已成功访问的页面url
             self.file.write('URL：' + url + ' 解析页面出错')
@@ -115,8 +133,15 @@ class Reptile:
         self.url_set_visited.add(url_path)
 
         # 写入内容
-        self.file3.write(url + ", " + title + ", " + str(url_map_parent.get(url_path)) +
-                         ", " + str(status_code) + " \n")
+        self.file3.write(
+            url +
+            ", " +
+            title +
+            ", " +
+            str(url_map_parent.get(url_path)) +
+            ", " +
+            str(status_code) + " \n"
+        )
         self.file3.flush()
 
         return self.data

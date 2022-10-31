@@ -21,6 +21,7 @@ from myHtmlParser import MyHtmlParser
 # url = 'http://news.sina.com.cn/china/'
 
 # 目标站点
+urlHost = 'www.cnipa.gov.cn'
 urlTarget = 'https://www.cnipa.gov.cn/'
 
 # 存放还没访问的url
@@ -105,7 +106,7 @@ html_parser = MyHtmlParser()
 print('正则检测死链')
 reptile = Reptile()
 # check_dead_links(reptile, html_parser, set(urlTarget), 'http', 'www.cnipa.gov.cn', '80', headers)
-check_dead_links(reptile, html_parser, {urlTarget}, 'http', 'www.cnipa.gov.cn', '80', headers)
+check_dead_links(reptile, html_parser, {urlTarget}, 'http', urlHost, '80', headers)
 
 # 释放资源
 reptile.closefile()
