@@ -27,7 +27,10 @@ urlTarget = 'https://www.cnipa.gov.cn/'
 url_set_not_visit = set()
 
 # 存放已访问的url
-url_set_visited = set()  
+url_set_visited = set()
+
+# 存放已访问的url字典映射，关联父url
+url_map_parent = {}
 
 
 def check_dead_links(reptile, html_parser, target_url_seed_set, protocol, host, port, headers):
@@ -37,24 +40,38 @@ def check_dead_links(reptile, html_parser, target_url_seed_set, protocol, host, 
     # print(reptile, html_parser, target_url_seed_set, protocol, host, port, headers)
     # exit()
     
+    # 原页面, 默认首页
+    origin_page = ''
+    
     while (target_url_seed_set):
         for url_path in target_url_seed_set:
             # 下载页面
-            page = reptile.get_page(protocol, host, port, url_path, headers, target_url_seed_set)
+            page = reptile.get_page(protocol, host, port, url_path, headers, url_map_parent)
 
             # 解析网页
             html_parser.feed(str(page))
 
             # 获取页面url
             url_set_on_page = html_parser.get_url_set_on_page()
+            # print(url_path, url_set_on_page)
+            # # exit()
 
             #exclusion = "mod=login|card.php|archiver|mod=viewthread|[.]css|[.]js|[.]gif|.jpg|about[.]php|panel[.]php|[.]swf|search[.]php"
             exclusion = '[.]xlsx'
             include = ''
 
-            # 获取种子url  关联下级页面
+            # 获取种子url
             target_url_seed_set_tmp = reptile.get_target_url_seed_set(url_set_on_page, include, exclusion)
-
+            # print(url_path, target_url_seed_set_tmp)
+            # exit()
+            
+            # 构建映射
+            for urlTarget in target_url_seed_set_tmp:
+                url_map_parent[urlTarget] = url_path
+            
+            # print(url_path, url_map_parent)
+            # exit()
+            
             url_set_not_visit = url_set_not_visit | target_url_seed_set_tmp
 
         url_set_visited = url_set_visited | target_url_seed_set

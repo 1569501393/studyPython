@@ -3,7 +3,8 @@
 
 __author__ = 'jieqiang'
 
-import gzip, re
+import gzip
+import re
 from io import BytesIO
 import time  # 引入time模块
 from urllib.request import *
@@ -11,6 +12,8 @@ import re
 import chardet
 
 # 爬虫类
+
+
 class Reptile:
     """to download web pages"""
 
@@ -19,7 +22,7 @@ class Reptile:
         self.filepath_of_urls_visited = filepath_of_urls_visited  # 用于存储已下载过的页面url
         self.filepath_of_urls_in_trouble = filepath_of_urls_in_trouble  # 用于存储访问出问题的页面url
         self.filepath_of_urls_result = filepath_of_urls_result  # 用于存储访问结果
-        self.data = "" # 存放访问url，返回的web页面数据
+        self.data = ""  # 存放访问url，返回的web页面数据
         self.file = open(self.filepath_of_urls_visited, 'w')
         self.file2 = open(self.filepath_of_urls_in_trouble, 'w')
         self.file3 = open(self.filepath_of_urls_result, 'w')
@@ -27,26 +30,26 @@ class Reptile:
         # self.file3.write("'link', 'text', 'page_where_found', 'server_response'")
         self.file3.write("link, text, page_where_found, server_response \n")
         self.file3.flush()
-        
-        self.page_visited_num = 0 # 访问页面计数器
 
-    def get_page(self, protocol, host, port, url_path, headers, origin_page={}):
+        self.page_visited_num = 0  # 访问页面计数器
+
+    def get_page(self, protocol, host, port, url_path, headers, url_map_parent={}):
         if not url_path.startswith("http://") and not url_path.startswith("https://"):
             url = protocol + '://' + host + ':' + port + url_path
         else:
             url = url_path
         request = Request(url, headers=headers)
-        request.add_header('Accept-encoding', 'gzip') #下载经过gzip方式压缩后的网页，减少网络流量
+        request.add_header('Accept-encoding', 'gzip')  # 下载经过gzip方式压缩后的网页，减少网络流量
 
         # 定义 title
-        title=''
-        status_code = 0;
-        
+        title = ''
+        status_code = 0
+
         try:
             print('正在访问第 %s 个链接:\n %s' % (self.page_visited_num, url))
-            response = urlopen(request) # 发送请求报文
+            response = urlopen(request)  # 发送请求报文
             self.page_visited_num = self.page_visited_num + 1
-            
+
             status_code = response.code
             # 存储已成功访问的页面url
             self.file.write('正在访问第 %s 个链接, code: %s :\n %s' % (self.page_visited_num, status_code, url))
@@ -55,14 +58,14 @@ class Reptile:
 
             if status_code == 200:  # 请求成功
                 print('访问成功。', end=' ')
-                page = response.read() # 读取经压缩后的页面
-                if response.info().get("Content-Encoding") ==  "gzip":
+                page = response.read()  # 读取经压缩后的页面
+                if response.info().get("Content-Encoding") == "gzip":
                     page_data = BytesIO(page)
-                    gzipper = gzip.GzipFile(fileobj = page_data)
+                    gzipper = gzip.GzipFile(fileobj=page_data)
                     self.data = gzipper.read()
                 else:
                     #page_data = BytesIO(page)
-                    #self.data = page #page_data  # 网页未采用gzip方式压缩，使用原页面
+                    # self.data = page #page_data  # 网页未采用gzip方式压缩，使用原页面
                     page_data = BytesIO(page)
                     self.data = page_data  # 网页未采用gzip方式压缩，使用原页面
 
@@ -70,9 +73,9 @@ class Reptile:
                 # print('正在对服务器返回body进行解码')
 
                 if encoding:
-                    if  encoding.lower() in ('gb2312', 'windows-1252', 'iso-8859-2', 'iso-8859-1'):
+                    if encoding.lower() in ('gb2312', 'windows-1252', 'iso-8859-2', 'iso-8859-1'):
                         self.data = self.data.decode('gbk')  # decode函数对获取的字节数据进行解码
-                    elif encoding.lower() in('utf-8', 'utf-8-sig'):
+                    elif encoding.lower() in ('utf-8', 'utf-8-sig'):
                         self.data = self.data.decode('utf-8')
                     elif encoding.lower() == 'ascii':
                         self.data = self.data.decode('unicode_escape')
@@ -92,7 +95,7 @@ class Reptile:
                     self.file.write('URL：' + url + ' 页面标题为空')
                     self.file.write('\n')
                     self.file.flush()
-                    
+
                 print('页面标题为：%s\n' % title)
             else:
                 print('访问链接 %s 失败' % url)
@@ -110,21 +113,18 @@ class Reptile:
 
         # 存储已经访问url的url_path
         self.url_set_visited.add(url_path)
-        
+
         # 写入内容
-        # self.file3.write("'link', 'text', 'page_where_found', 'server_response'")
-        # self.file3.write("url, title, url_path, response.code \n")
-        # self.file3.write(url + ", " + title + ", " + url_path + ", " +
-        #                  str(status_code) + ", " + str(origin_page) + " \n")
-        self.file3.write(url + ", " + title + ", " + url_path + ", " + str(status_code) + " \n")
+        self.file3.write(url + ", " + title + ", " + str(url_map_parent.get(url_path)) +
+                         ", " + str(status_code) + " \n")
         self.file3.flush()
 
         return self.data
 
     # 获取种子URL
     def get_target_url_seed_set(self, url_set, include, exclusion):
-        url_seed_set = set() # 存放相同服务器下的url
-        target_url_seed_set = set() # 存放目标的url
+        url_seed_set = set()  # 存放相同服务器下的url
+        target_url_seed_set = set()  # 存放目标的url
 
         # 过滤不属于当前服务器下的url
         while len(url_set) != 0:
@@ -142,7 +142,7 @@ class Reptile:
         else:
             target_url_seed_set = url_seed_set
 
-        #过滤掉已经抓取过的url
+        # 过滤掉已经抓取过的url
         target_url_seed_set = target_url_seed_set - self.url_set_visited
 
         return target_url_seed_set
