@@ -50,13 +50,14 @@ class Reptile:
         status_code = 0
 
         try:
-            print('正在访问第 %s 个链接:\n %s' % (self.page_visited_num, url))
+            print('%s: 正在访问第 %s 个链接:\n %s' % (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, url))
             response = urlopen(request)  # 发送请求报文
             self.page_visited_num = self.page_visited_num + 1
 
             status_code = response.code
             # 存储已成功访问的页面url
-            self.file.write('正在访问第 %s 个链接, code: %s :\n %s' % (self.page_visited_num, status_code, url))
+            self.file.write('%s: 正在访问第 %s 个链接:\n %s' % (time.strftime(
+                "%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, url))
             self.file.write('\n')
             self.file.flush()
 
@@ -117,15 +118,16 @@ class Reptile:
         
             print('解析页面出错\n')
             # 存储已成功访问的页面url
-            self.file.write('URL：' + url + ' 解析页面出错')
+            self.file.write('URL：' + url + ' 解析页面出错, status_code=' + str(status_code))
             self.file.write('\n')
             self.file.flush()
             
             self.page_visited_num = self.page_visited_num + 1
-            # status_code = e.code
-            # print("111")
-            # print(str(e))
-            # exit()
+            # 存储已成功访问的页面url
+            self.file.write('%s: 正在访问第 %s 个链接:\n %s' % (time.strftime(
+                "%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, url))
+            self.file.write('\n')
+            self.file.flush()
 
         # 存储已经访问url的url_path
         self.url_set_visited.add(url_path)
