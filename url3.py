@@ -37,12 +37,6 @@ def check_dead_links(reptile, html_parser, target_url_seed_set, protocol, host, 
     global url_set_not_visit
     global url_set_visited
 
-    # print(reptile, html_parser, target_url_seed_set, protocol, host, port, headers)
-    # exit()
-
-    # 原页面, 默认首页
-    origin_page = ''
-
     while (target_url_seed_set):
         for url_path in target_url_seed_set:
             # 下载页面
@@ -86,23 +80,6 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'
 }
 # headers = {'Connection': 'close'}
-
-# url = 'http://www.adjyc.com'
-
-# 获取状态码
-
-
-def getHttpStatusCode(url):
-    global headers
-    try:
-        request = requests.get(url, headers=headers, verify=False)
-        httpStatusCode = request.status_code
-        return httpStatusCode
-    except requests.exceptions.HTTPError as e:
-        # pass
-        return e
-        # return '443'
-
 
 print('正则构造html解析器')
 html_parser = MyHtmlParser()

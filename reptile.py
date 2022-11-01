@@ -15,8 +15,6 @@ import requests
 
 
 # 爬虫类
-
-
 class Reptile:
     """to download web pages"""
 
@@ -44,7 +42,6 @@ class Reptile:
             
         # TODO 
         # url = 'http://www.cnipa.gov.cn:80/picture/0/2209200924244393056.jpg'
-            
         request = Request(url, headers=headers)
         request.add_header('Accept-encoding', 'gzip')  # 下载经过gzip方式压缩后的网页，减少网络流量
 
