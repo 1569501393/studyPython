@@ -7,11 +7,13 @@ import gzip
 import re
 from io import BytesIO
 import time  # 引入time模块
-from urllib.request import *
+# from urllib.request import *
+# from urllib import *
+import urllib.request
 import urllib.error
-import re
+
 import chardet
-import requests
+# import requests
 
 
 # 爬虫类
@@ -41,94 +43,91 @@ class Reptile:
             url = protocol + '://' + host + ':' + port + url_path
         else:
             url = url_path
-            
-        # TODO 
-        # url = 'http://www.cnipa.gov.cn:80/picture/0/2209200924244393056.jpg'
-            
-        request = Request(url, headers=headers)
+        request = urllib.request.Request(url, headers=headers)
         request.add_header('Accept-encoding', 'gzip')  # 下载经过gzip方式压缩后的网页，减少网络流量
 
         # 定义 title
         title = ''
         status_code = 0
-
+        
         try:
-            print('正在访问第 %s 个链接:\n %s' % (self.page_visited_num, url))
-            response = urlopen(request)  # 发送请求报文
-            self.page_visited_num = self.page_visited_num + 1
+            print('%s, 正在访问第 %s 个链接:\n %s' % (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, url))
 
-            status_code = response.code
+            # response = urlopen(request)  # 发送请求报文
+            response = urllib.request.urlopen(request)  # 发送请求报文
+            # status_code = response.code
+            status_code = response.getcode()
+            
             # 存储已成功访问的页面url
-            self.file.write('正在访问第 %s 个链接, code: %s :\n %s' % (self.page_visited_num, status_code, url))
-            self.file.write('\n')
+            self.file.write('%s, 正在访问第 %s 个链接: code: %s \n %s' % (time.strftime(
+                "%Y-%m-%d-%H-%M-%S", time.localtime()), self.page_visited_num, status_code, url))
             self.file.flush()
+            
+            self.page_visited_num = self.page_visited_num + 1
 
             if status_code == 200:  # 请求成功
                 print('访问成功。', end=' ')
-                # Content-Type  text/html
-                if  response.info().get("Content-Type").startswith('text/html'):
-         
-                    page = response.read()  # 读取经压缩后的页面
+                page = response.read()  # 读取经压缩后的页面
+                if response.info().get("Content-Encoding") == "gzip":
                     page_data = BytesIO(page)
+                    gzipper = gzip.GzipFile(fileobj=page_data)
+                    self.data = gzipper.read()
+                else:
+                    #page_data = BytesIO(page)
+                    # self.data = page #page_data  # 网页未采用gzip方式压缩，使用原页面
+                    page_data = BytesIO(page)
+                    self.data = page_data  # 网页未采用gzip方式压缩，使用原页面
 
-                    if response.info().get("Content-Encoding") == "gzip":
-                        gzipper = gzip.GzipFile(fileobj=page_data)
-                        self.data = gzipper.read()
+                # encoding = chardet.detect(self.data)['encoding']
+                encoding = chardet.detect(self.data)['encoding']
+                # print('正在对服务器返回body进行解码')
+
+                if encoding:
+                    if encoding.lower() in ('gb2312', 'windows-1252', 'iso-8859-2', 'iso-8859-1'):
+                        self.data = self.data.decode('gbk')  # decode函数对获取的字节数据进行解码
+                    elif encoding.lower() in ('utf-8', 'utf-8-sig'):
+                        self.data = self.data.decode('utf-8')
+                    elif encoding.lower() == 'ascii':
+                        self.data = self.data.decode('unicode_escape')
                     else:
-                        self.data = page_data  # 网页未采用gzip方式压缩，使用原页面
-
-                    encoding = chardet.detect(self.data)['encoding']
-                    print('正在对服务器返回body进行解码: ' + str(encoding))
-
-                    if encoding:
-                        if encoding.lower() in ('gb2312', 'windows-1252', 'iso-8859-2', 'iso-8859-1'):
-                            self.data = self.data.decode('gbk')  # decode函数对获取的字节数据进行解码
-                        elif encoding.lower() in ('utf-8', 'utf-8-sig'):
-                            self.data = self.data.decode('utf-8')
-                        elif encoding.lower() == 'ascii':
-                            self.data = self.data.decode('unicode_escape')
-                        else:
-                            print('解码失败，未知编码:%s，不对body做任何解码' % encoding)
-                            # 存储已成功访问的页面url
-                            self.file.write('URL：' + url + ' 解码失败，未知编码:%s，不对body做任何解码' % encoding)
-                            self.file.write('\n')
-                            self.file.flush()
-                            pass
-                    result = re.findall("<title>(.+?)</title>", str(self.data))
-                    if result:
-                        title = result[0]
-                    else:
-                        title = '页面标题为空'
+                        print('解码失败，未知编码:%s，不对body做任何解码' % encoding)
                         # 存储已成功访问的页面url
-                        self.file.write('URL：' + url + ' 页面标题为空')
+                        self.file.write('URL：' + url + ' 解码失败，未知编码:%s，不对body做任何解码' % encoding)
                         self.file.write('\n')
                         self.file.flush()
+                        pass
+                result = re.findall("<title>(.+?)</title>", str(self.data))
+                if result:
+                    title = result[0]
+                else:
+                    title = '页面标题为空'
+                    # 存储已成功访问的页面url
+                    self.file.write('URL：' + url + ' 页面标题为空')
+                    self.file.write('\n')
+                    self.file.flush()
 
-                    print('页面标题为：%s\n' % title)
+                print('页面标题为：%s\n' % title)
             else:
                 print('访问链接 %s 失败' % url)
                 # 存储已成功访问的页面url
                 self.file.write('URL：' + url + ' 访问链接 %s 失败' % url)
                 self.file.write('\n')
                 self.file.flush()
-        except Exception as e:
-        # except urllib.error.HTTPError as e:
+        # except Exception as e:
+        except urllib.error.HTTPError as e:
+        # except request as e:
             pass
-        
-            request = requests.get(url, headers=headers, verify=False)
-            status_code = request.status_code
-        
+
+            self.page_visited_num = self.page_visited_num + 1
+            status_code = e.code
+            # print("111")
+            # print(str(e))
+            # exit()
             print('解析页面出错\n')
             # 存储已成功访问的页面url
             self.file.write('URL：' + url + ' 解析页面出错')
             self.file.write('\n')
             self.file.flush()
-            
-            self.page_visited_num = self.page_visited_num + 1
-            # status_code = e.code
-            # print("111")
-            # print(str(e))
-            # exit()
 
         # 存储已经访问url的url_path
         self.url_set_visited.add(url_path)

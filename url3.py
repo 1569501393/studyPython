@@ -33,17 +33,16 @@ url_set_visited = set()
 # 存放已访问的url字典映射，关联父url
 url_map_parent = {}
 
-
 def check_dead_links(reptile, html_parser, target_url_seed_set, protocol, host, port, headers):
     global url_set_not_visit
     global url_set_visited
 
     # print(reptile, html_parser, target_url_seed_set, protocol, host, port, headers)
     # exit()
-    
+
     # 原页面, 默认首页
     origin_page = ''
-    
+
     while (target_url_seed_set):
         for url_path in target_url_seed_set:
             # 下载页面
@@ -65,30 +64,34 @@ def check_dead_links(reptile, html_parser, target_url_seed_set, protocol, host, 
             target_url_seed_set_tmp = reptile.get_target_url_seed_set(url_set_on_page, include, exclusion)
             # print(url_path, target_url_seed_set_tmp)
             # exit()
-            
+
             # 构建映射
             for urlTarget in target_url_seed_set_tmp:
                 url_map_parent[urlTarget] = url_path
-            
+
             # print(url_path, url_map_parent)
             # exit()
-            
+
             url_set_not_visit = url_set_not_visit | target_url_seed_set_tmp
 
         url_set_visited = url_set_visited | target_url_seed_set
         target_url_seed_set = url_set_not_visit - url_set_visited
-        
+
 
 # 获取字符串格式的html_doc。由于content为bytes类型，故需要decode()
 # html_doc = requests.get('https://xkcd.com/353/').content.decode()
 # 加 headers
 # headers = {'user-agent': 'my-app/0.0.1'}
 headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'
+}
+# headers = {'Connection': 'close'}
 
 # url = 'http://www.adjyc.com'
 
 # 获取状态码
+
+
 def getHttpStatusCode(url):
     global headers
     try:
@@ -99,6 +102,7 @@ def getHttpStatusCode(url):
         # pass
         return e
         # return '443'
+
 
 print('正则构造html解析器')
 html_parser = MyHtmlParser()
