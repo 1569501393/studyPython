@@ -1,6 +1,8 @@
 #!/user/bin/python
 # -*- coding: utf-8 -*-
 # Python 中文编码
+import os
+
 # 导入csv
 import csv
 import time  # 引入time模块
@@ -12,12 +14,15 @@ import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+from urllib.parse import urlparse
+
 # 目标站点
 urlHost = 'www.cnipa.gov.cn'
+# urlHost = 'www.adjyc.com'
 
 # 目标url
-# urlTarget = 'https://' + urlHost + '/'
 urlTarget = 'https://' + urlHost
+# urlTarget = 'http://' + urlHost
 
 # 存放还没访问的url
 urlSetNotVisit = set()
@@ -98,7 +103,7 @@ def returnUrl(strx):
     if strx.startswith("http"):
         return strx
     else:
-        return 'https://www.cnipa.gov.cn/' + strx
+        return 'https://'+urlHost+'/' + strx
 
 
 with open(logFileName, 'w') as logFile:
@@ -125,23 +130,54 @@ with open(logFileName, 'w') as logFile:
 
                 # urlPath 转 完整url
                 urlFull = returnUrl(urlPath)
+                # TODO test
+                # urlFull = 'https://www.cnipa.gov.cn/module/download/down.jsp?i_ID=179049&colID=74'
+                # urlFull = 'https://www.cnipa.gov.cn/art/2020/5/26/art_701_14.html'
+                
                 # print(urlPath, urlFull)
-                # exit()
+                # exit() 
 
                 # 下载页面
                 print('%s: 正在访问第 %s 个链接, urlFull:\n %s' %
                       (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), pageVisitedNum, urlFull))
                 pageVisitedNum += 1
+                
+                # 跳过非 链接后缀 url
+                notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
+                                    '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
+                # urlFull2 = urlFull[len(urlFull) - 5:].lower()
+                # print('urlFull2==', urlFull2)
+                # exit()
+                # s2 = "."
+                # print(urlFull2.index(s2));
+                # u1 = urlFull[len(urlFull) - 4 + urlFull2.index(s2):].lower()
+                # print(u1);
+                
+                a = urlparse(urlFull)
+                # a = urllib3.parse(urlFull)
+                print(a)
+                # file_path = a.path
+                linkFileName = os.path.basename(a.path)
+                _, linkSuffix = os.path.splitext(linkFileName)
+                print(linkFileName)
+                print(linkSuffix)
+                # exit()
+
+                # # print(urlFull2[:urlFull2.index(s2)]);
+                if (linkSuffix in notLinkSuffixSet):
+                    continue
 
                 try:
                     page = getHttpRequest(urlFull)
                 except requests.exceptions.HTTPError as e:
+                    print(('\n异常request urlFull: %s, code: %s, message: %s' %
+                           (urlFull, str(e.code), e.message)))
                     # 写日志
                     logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
                                   (urlFull, str(e.code), e.message)))
                     logFile.flush()
                     continue
-                    pass
+                    # pass
                 # page = getHttpRequest(urlFull)
                 # print(page.get("Content-Type"))
                 # exit()
@@ -150,12 +186,13 @@ with open(logFileName, 'w') as logFile:
                 try:
                     htmlDoc = page.content.decode()
                 except Exception as e:
+                    print(('\n异常解码 urlFull: %s, code: %s, message: %s' % (urlFull, '', '')))
                     # 写日志
                     logFile.write(('\n异常解码 urlFull: %s, code: %s, message: %s' % (urlFull, '', '')))
                     logFile.flush()
 
                     continue
-                    pass
+                    # pass
 
                 # 解析网页
                 soup = BeautifulSoup(htmlDoc, 'html.parser')
@@ -228,3 +265,6 @@ with open(logFileName, 'w') as logFile:
 
             # print(targetUrlSeedSet, '\n====== \n', urlSetNotVisit,  '\n======\n', urlSetVisited)
             # exit()
+
+
+print('检查完成')
