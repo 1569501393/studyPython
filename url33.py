@@ -38,12 +38,19 @@ urlSetVisited = set()
 # 当前页url
 urlSetOnPage = set()
 
+targetUrlSeedSetTmp = set()
+
 # 存放已访问的url字典映射，关联父url
 urlMapParent = {}
 
 # 访问页面计数器
 pageVisitedNum = 0
 
+# 非 链接后缀 url
+notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
+                    '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
+
+pageContentType = ''
 
 # 获取字符串格式的html_doc。由于content为bytes类型，故需要decode()
 # html_doc = requests.get('https://xkcd.com/353/').content.decode()
@@ -71,6 +78,17 @@ serverResponseStatusCode = 0
 # 日志文件
 csvFileName = './storage/link_' + urlHost+ '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
 logFileName = './storage/log_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
+
+# 获取链接后缀
+def getLinkSuffix(urlFull):
+    a = urlparse(urlFull)
+    print(a)
+    linkFileName = os.path.basename(a.path)
+    _, linkSuffix = os.path.splitext(linkFileName)
+    print(linkFileName)
+    print(linkSuffix)
+    # exit()
+    return linkSuffix
 
 
 # 获取状态码
@@ -138,6 +156,8 @@ with open(logFileName, 'w') as logFile:
                 # TODO test
                 # urlFull = 'https://www.cnipa.gov.cn/module/download/down.jsp?i_ID=179049&colID=74'
                 # urlFull = 'https://www.cnipa.gov.cn/art/2020/5/26/art_701_14.html'
+                # urlFull = 'http://www.customs.gov.cn/'
+                
                 
                 # print(urlPath, urlFull)
                 # exit() 
@@ -147,52 +167,35 @@ with open(logFileName, 'w') as logFile:
                       (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), pageVisitedNum, urlFull))
                 pageVisitedNum += 1
                 
-                # # 跳过非 链接后缀 url
-                # TODO 外层过滤 .zip文件，加快检索
-                # notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
-                #                     '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
+                # TODO 过滤 zip,jpg 等大文件, 加快检查效率
+                # 跳过非 链接后缀 url
+                linkSuffix = getLinkSuffix(urlFull)
 
-                # a = urlparse(urlFull)
-                # # a = urllib3.parse(urlFull)
-                # print(a)
-                # # file_path = a.path
-                # linkFileName = os.path.basename(a.path)
-                # _, linkSuffix = os.path.splitext(linkFileName)
-                # print(linkFileName)
-                # print(linkSuffix)
-                # # exit()
-
-                # # # print(urlFull2[:urlFull2.index(s2)]);
-                # if (linkSuffix in notLinkSuffixSet):
-                #     continue
+                if (linkSuffix in notLinkSuffixSet):
+                    continue
                 
                 try:
                     page = getHttpRequest(urlFull)
+                    # https://www.runoob.com/http/http-content-type.html
+                    # print(type(page.headers), type(linkSuffix), type(notLinkSuffixSet), 'Content-Type2' in page.headers)
+                    # exit()
+                    if 'Content-Type' in page.headers:
+                        pageContentType = page.headers['Content-Type']
+                        
+                    # print('page======', page, page.headers['Content-Type'])
+                    # print('page======', page, page.headers)
+                    # exit()
                     
                     # 跳过非 链接后缀 url
-                    notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
-                                        '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
-                    # urlFull2 = urlFull[len(urlFull) - 5:].lower()
-                    # print('urlFull2==', urlFull2)
+                    # linkSuffix = getLinkSuffix(urlFull)
+                    
+                    # if (linkSuffix in notLinkSuffixSet):
+                    #     continue
+                    # print('page======', page, page.headers)
                     # exit()
-                    # s2 = "."
-                    # print(urlFull2.index(s2));
-                    # u1 = urlFull[len(urlFull) - 4 + urlFull2.index(s2):].lower()
-                    # print(u1);
-
-                    a = urlparse(urlFull)
-                    # a = urllib3.parse(urlFull)
-                    # print(a)
-                    # file_path = a.path
-                    linkFileName = os.path.basename(a.path)
-                    _, linkSuffix = os.path.splitext(linkFileName)
-                    # print(linkFileName)
-                    # print(linkSuffix)
-                    # exit()
-
-                    # # print(urlFull2[:urlFull2.index(s2)]);
-                    if (linkSuffix in notLinkSuffixSet):
+                    if (not pageContentType.startswith("text/html")):
                         continue
+                    
                     
                 except requests.exceptions.HTTPError as e:
                     print(('\n异常request urlFull: %s, code: %s, message: %s' %
@@ -203,10 +206,6 @@ with open(logFileName, 'w') as logFile:
                     logFile.flush()
                     continue
                     # pass
-                # page = getHttpRequest(urlFull)
-                # print(page.get("Content-Type"))
-                # exit()
-
                     # TODO 只解析 utf8
                 try:
                     htmlDoc = page.content.decode()
