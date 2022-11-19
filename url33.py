@@ -24,6 +24,11 @@ urlHost = 'www.cnipa.gov.cn'
 urlTarget = 'https://' + urlHost
 # urlTarget = 'http://' + urlHost
 
+# TODO test, 同时配合修改 111 行左右 returnUrl: https => http
+# urlHost = 'www.adjyc.com'
+# urlTarget = 'http://' + urlHost
+
+
 # 存放还没访问的url
 urlSetNotVisit = set()
 
@@ -64,8 +69,8 @@ targetUrlSeedSet = {urlTarget}
 serverResponseStatusCode = 0
 
 # 日志文件
-csvFileName = './storage/link_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
-logFileName = './storage/log_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
+csvFileName = './storage/link_' + urlHost+ '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
+logFileName = './storage/log_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
 
 
 # 获取状态码
@@ -97,13 +102,13 @@ def checkIsUrl(strx):
     return strx.startswith("http")
 
 # 返回 url
-
-
 def returnUrl(strx):
     if strx.startswith("http"):
         return strx
     else:
         return 'https://'+urlHost+'/' + strx
+        # TODO adjyc
+        # return 'http://'+urlHost+'/' + strx
 
 
 with open(logFileName, 'w') as logFile:
@@ -142,33 +147,53 @@ with open(logFileName, 'w') as logFile:
                       (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), pageVisitedNum, urlFull))
                 pageVisitedNum += 1
                 
-                # 跳过非 链接后缀 url
-                notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
-                                    '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
-                # urlFull2 = urlFull[len(urlFull) - 5:].lower()
-                # print('urlFull2==', urlFull2)
-                # exit()
-                # s2 = "."
-                # print(urlFull2.index(s2));
-                # u1 = urlFull[len(urlFull) - 4 + urlFull2.index(s2):].lower()
-                # print(u1);
+                # # 跳过非 链接后缀 url
+                # TODO 外层过滤 .zip文件，加快检索
+                # notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
+                #                     '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
+
+                # a = urlparse(urlFull)
+                # # a = urllib3.parse(urlFull)
+                # print(a)
+                # # file_path = a.path
+                # linkFileName = os.path.basename(a.path)
+                # _, linkSuffix = os.path.splitext(linkFileName)
+                # print(linkFileName)
+                # print(linkSuffix)
+                # # exit()
+
+                # # # print(urlFull2[:urlFull2.index(s2)]);
+                # if (linkSuffix in notLinkSuffixSet):
+                #     continue
                 
-                a = urlparse(urlFull)
-                # a = urllib3.parse(urlFull)
-                print(a)
-                # file_path = a.path
-                linkFileName = os.path.basename(a.path)
-                _, linkSuffix = os.path.splitext(linkFileName)
-                print(linkFileName)
-                print(linkSuffix)
-                # exit()
-
-                # # print(urlFull2[:urlFull2.index(s2)]);
-                if (linkSuffix in notLinkSuffixSet):
-                    continue
-
                 try:
                     page = getHttpRequest(urlFull)
+                    
+                    # 跳过非 链接后缀 url
+                    notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
+                                        '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
+                    # urlFull2 = urlFull[len(urlFull) - 5:].lower()
+                    # print('urlFull2==', urlFull2)
+                    # exit()
+                    # s2 = "."
+                    # print(urlFull2.index(s2));
+                    # u1 = urlFull[len(urlFull) - 4 + urlFull2.index(s2):].lower()
+                    # print(u1);
+
+                    a = urlparse(urlFull)
+                    # a = urllib3.parse(urlFull)
+                    # print(a)
+                    # file_path = a.path
+                    linkFileName = os.path.basename(a.path)
+                    _, linkSuffix = os.path.splitext(linkFileName)
+                    # print(linkFileName)
+                    # print(linkSuffix)
+                    # exit()
+
+                    # # print(urlFull2[:urlFull2.index(s2)]);
+                    if (linkSuffix in notLinkSuffixSet):
+                        continue
+                    
                 except requests.exceptions.HTTPError as e:
                     print(('\n异常request urlFull: %s, code: %s, message: %s' %
                            (urlFull, str(e.code), e.message)))
@@ -225,6 +250,11 @@ with open(logFileName, 'w') as logFile:
                     }
                 )
                 csvFile.flush()
+                
+                # 判断是否本站点, 非本站点，无需检测子链接
+                if not urlFull.startswith(urlTarget):
+                    continue
+                
 
                 # 获取页面url
                 # url_set_on_page = html_parser.get_url_set_on_page()
@@ -241,8 +271,11 @@ with open(logFileName, 'w') as logFile:
                         returnUrlFull = returnUrl(item.get('href'))
 
                     # 本站点
-                    if returnUrlFull.startswith(urlTarget):
-                        urlSetOnPage.add(returnUrlFull)
+                    # if returnUrlFull.startswith(urlTarget):
+                    #     urlSetOnPage.add(returnUrlFull)
+                    
+                    # 非本这点也要验证自身url是否死链
+                    urlSetOnPage.add(returnUrlFull)
 
                 # 获取种子url
                 targetUrlSeedSetTmp = urlSetOnPage
@@ -263,7 +296,11 @@ with open(logFileName, 'w') as logFile:
             urlSetVisited = urlSetVisited | targetUrlSeedSet
             targetUrlSeedSet = urlSetNotVisit - urlSetVisited
 
-            # print(targetUrlSeedSet, '\n====== \n', urlSetNotVisit,  '\n======\n', urlSetVisited)
+            print('\n targetUrlSeedSet====== \n', targetUrlSeedSet,
+                  '\n urlSetNotVisit====== \n', urlSetNotVisit,  
+                  '\n urlSetVisited======\n', urlSetVisited,
+                  '\n targetUrlSeedSetTmp======\n', targetUrlSeedSetTmp,
+                  )
             # exit()
 
 
