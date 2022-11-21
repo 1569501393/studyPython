@@ -129,9 +129,9 @@ def returnUrl(strx):
         # return 'http://'+urlHost+'/' + strx
 
 
-with open(logFileName, 'w') as logFile:
+with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
     # 写csv
-    with open(csvFileName, 'w', newline='') as csvFile:
+    with open(csvFileName, 'w',encoding='utf-8-sig',newline='') as csvFile:
         fieldnames = ['link', 'text', 'pageWhereFound', 'serverResponse']
         writer = csv.DictWriter(csvFile, fieldnames=fieldnames)
         writer.writeheader()
