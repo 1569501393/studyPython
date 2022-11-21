@@ -18,6 +18,8 @@ from urllib.parse import urlparse
 
 from random import randint
 
+import time
+
 # 目标站点
 urlHost = 'www.cnipa.gov.cn'
 # urlHost = 'www.adjyc.com'
@@ -112,18 +114,6 @@ def getLinkSuffix(urlFull):
     # exit()
     return linkSuffix
 
-
-# 获取状态码
-
-
-def getHttpStatusCode(url):
-    try:
-        request = getHttpRequest(url)
-        httpStatusCode = request.status_code
-        return httpStatusCode
-    except requests.exceptions.HTTPError as e:
-        return e
-
 # 获取随机 UA
 def getRandomUa() :
     global userAgents
@@ -135,7 +125,9 @@ def getRandomUa() :
 def getHttpRequest(url):
     # global headers
     
-    headers = {'user-agent': getRandomUa()}
+    headers = {'user-agent': getRandomUa(), 'Connection':'close'}
+    print('===================================headers==========')
+    print(headers)
 
     try:
         return requests.get(url, headers=headers, verify=False)
@@ -203,6 +195,10 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 if (linkSuffix in notLinkSuffixSet):
                     continue
                 
+                
+                # 休息 0.5 秒
+                time.sleep(0.5)
+                
                 try:
                     page = getHttpRequest(urlFull)
                     # https://www.runoob.com/http/http-content-type.html
@@ -224,8 +220,6 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     # exit()
                     if (not pageContentType.startswith("text/html")):
                         continue
-                    
-                    
                 except requests.exceptions.HTTPError as e:
                     print(('\n异常request urlFull: %s, code: %s, message: %s' %
                            (urlFull, str(e.code), e.message)))
