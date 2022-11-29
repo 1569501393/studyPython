@@ -58,9 +58,11 @@ try
 exceptions
 
 #### javascript 和 mailto 过滤
-http://36.112.95.124/reexam_out2020New/searchIndexKS.jsp
-try 
-exceptions
+# 过滤 javascript 和 mailto
+if urlPath.find('javascript') != -1:
+	continue
+if urlPath.find('mailto') != -1:
+	continue
 
 
 #### break
