@@ -52,6 +52,16 @@ WDScanner平台目前实现了如下功能：分布式web漏洞扫描、客户�
 
 
 ### 修改点
+#### 主机拒绝访问
+http://36.112.95.124/reexam_out2020New/searchIndexKS.jsp
+try 
+exceptions
+
+#### javascript 和 mailto 过滤
+http://36.112.95.124/reexam_out2020New/searchIndexKS.jsp
+try 
+exceptions
+
 
 #### break
 

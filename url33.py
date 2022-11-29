@@ -11,6 +11,8 @@ import time  # 引入time模块
 from bs4 import BeautifulSoup
 import requests
 
+import requests_random_user_agent
+
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -121,17 +123,40 @@ def getRandomUa() :
 
 # 获取请求
 
+# s = requests.Session()
+# print(s.headers['User-Agent'])
+
+# # Without a session
+# resp = requests.get('https://httpbin.org/user-agent')
+# print('user-agent======', resp.json()['user-agent'])
+# print('resp========', resp.json())
+# exit()
 
 def getHttpRequest(url):
     # global headers
+    s = requests.Session()
     
-    headers = {'user-agent': getRandomUa(), 'Connection':'close'}
+    headers = {'user-agent': s.headers['User-Agent'], 'Connection':'close'}
     print('===================================headers==========')
     print(headers)
-
+    
     try:
-        return requests.get(url, headers=headers, verify=False)
+        resGet = requests.get(url, headers=headers, verify=False)
+        return resGet
     except requests.exceptions.HTTPError as e:
+        # TODO debug
+        print(111)
+        print(e)
+        return e
+    except requests.exceptions.ConnectionError as e:
+        # TODO debug
+        print(222)
+        print(e)
+        return e
+    except:
+        # return e
+        print(333)
+        print(e)
         return e
 
 # 检测字符串是否url
@@ -171,6 +196,13 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 # 写日志
                 logFile.write(logContent)
                 logFile.flush()
+                
+                # 过滤 javascript 和 mailto
+                if urlPath.find('javascript') != -1:
+                    continue
+                if urlPath.find('mailto') != -1:
+                    continue
+                
 
                 # urlPath 转 完整url
                 urlFull = returnUrl(urlPath)
@@ -178,6 +210,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 # urlFull = 'https://www.cnipa.gov.cn/module/download/down.jsp?i_ID=179049&colID=74'
                 # urlFull = 'https://www.cnipa.gov.cn/art/2020/5/26/art_701_14.html'
                 # urlFull = 'http://www.customs.gov.cn/'
+                # urlFull = 'http://36.112.95.124/reexam_out2020New/searchIndexKS.jsp'
                 
                 
                 # print(urlPath, urlFull)
@@ -197,7 +230,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 
                 
                 # 休息 0.5 秒
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 
                 try:
                     page = getHttpRequest(urlFull)
@@ -226,6 +259,26 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     # 写日志
                     logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
                                   (urlFull, str(e.code), e.message)))
+                    logFile.flush()
+                    continue
+                    # pass
+                    # TODO 只解析 utf8
+                except requests.exceptions.ConnectionError as e:
+                    print(('\n异常request urlFull: %s, code: %s, message: %s' %
+                           (urlFull, str(e.code), e.message)))
+                    # 写日志
+                    logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
+                                  (urlFull, str(e.code), e.message)))
+                    logFile.flush()
+                    continue
+                    # pass
+                    # TODO 只解析 utf8
+                except :
+                    print(('\n异常request urlFull: %s, code: %s, message: %s' %
+                           (urlFull, str(500), 'error')))
+                    # 写日志
+                    logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
+                                  (urlFull, str(500), 'error')))
                     logFile.flush()
                     continue
                     # pass
@@ -262,21 +315,21 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     title = '页面标题为空'
 
                 # 写入 csv
-                pageWhereFound = ''
-                writer.writerow(
-                    {
-                        'link': urlFull,
-                        'text': title,
-                        'pageWhereFound': str(urlMapParent.get(urlFull)),
-                        'serverResponse': page.status_code
-                    }
-                )
-                csvFile.flush()
+                if page.status_code != 200 :
+                    pageWhereFound = ''
+                    writer.writerow(
+                        {
+                            'link': urlFull,
+                            'text': title,
+                            'pageWhereFound': str(urlMapParent.get(urlFull)),
+                            'serverResponse': page.status_code
+                        }
+                    )
+                    csvFile.flush()
                 
                 # 判断是否本站点, 非本站点，无需检测子链接
                 if not urlFull.startswith(urlTarget):
                     continue
-                
 
                 # 获取页面url
                 # url_set_on_page = html_parser.get_url_set_on_page()
