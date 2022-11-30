@@ -94,6 +94,8 @@ userAgents = [
 # title IndexError: list index out of range
 # urlTarget = 'https://pss-system.cponline.cnipa.gov.cn'
 # urlTarget = 'http://wsgs.sbj.cnipa.gov.cn:9080/tmpu/'
+# urlTarget = 'http://wsgs.sbj.cnipa.gov.cn:9080/tmpu/\\'
+# urlTarget = 'http://wsgs.sbj.cnipa.gov.cn:9080/tmpu/javascript'
 
 targetUrlSeedSet = {urlTarget}
 
@@ -198,9 +200,20 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 logFile.flush()
                 
                 # 过滤 javascript 和 mailto
-                if urlPath.find('javascript') != -1:
+                # if urlPath.find('javascript') != -1:
+                #     continue
+                # if urlPath.find('mailto') != -1:
+                #     continue
+                # if urlPath.find('/\\') != -1:
+                #     continue
+                if 'javascript' in urlPath:
+                    print('=============urlPath带有javascript')
                     continue
-                if urlPath.find('mailto') != -1:
+                if 'mailto' in urlPath:
+                    print('=============urlPath带有mailto')
+                    continue
+                if '/\\' in urlPath:
+                    print('=============urlPath带有/\\')
                     continue
                 
 
