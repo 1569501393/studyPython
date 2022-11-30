@@ -30,7 +30,7 @@ urlHost = 'www.cnipa.gov.cn'
 urlTarget = 'https://' + urlHost
 # urlTarget = 'http://' + urlHost
 
-# TODO test, 同时配合修改 111 行左右 returnUrl: https => http
+# TODO test, 同时配合修改 170 行左右 returnUrl: https => http
 # urlHost = 'www.adjyc.com'
 # urlTarget = 'http://' + urlHost
 
@@ -171,7 +171,7 @@ def returnUrl(strx):
         return strx
     else:
         return 'https://'+urlHost+'/' + strx
-        # TODO adjyc
+        # # TODO adjyc
         # return 'http://'+urlHost+'/' + strx
 
 
@@ -280,9 +280,19 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
                                   (urlFull, str(500), 'error')))
                     logFile.flush()
+                    
+                    pageWhereFound = ''
+                    writer.writerow(
+                        {
+                            'link': urlFull,
+                            'text': 'error',
+                            'pageWhereFound': str(urlMapParent.get(urlFull)),
+                            'serverResponse': 500
+                        }
+                    )
+                    csvFile.flush()
+                    
                     continue
-                    # pass
-                    # TODO 只解析 utf8
                 try:
                     htmlDoc = page.content.decode()
                 except Exception as e:
@@ -376,7 +386,10 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                   '\n urlSetVisited======\n', urlSetVisited,
                   '\n targetUrlSeedSetTmp======\n', targetUrlSeedSetTmp,
                   )
+            
+            # 写日志
+            logFile.write('\n ============检查完成============')
+            logFile.flush()
             # exit()
-
 
 print('检查完成')
