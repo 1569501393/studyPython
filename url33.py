@@ -49,6 +49,9 @@ targetUrlSeedSetTmp = set()
 # 存放已访问的url字典映射，关联父url
 urlMapParent = {}
 
+# 存放url标题字典映射
+urlMapTitle = {}
+
 # 访问页面计数器
 pageVisitedNum = 0
 
@@ -170,12 +173,15 @@ def checkIsUrl(strx):
 # 返回 url
 def returnUrl(strx):
     if strx.startswith("http"):
-        return strx
+        return strx.strip()
     else:
-        return 'https://'+urlHost+'/' + strx
+        # return 'https://'+urlHost+'/' + strx
         # # TODO adjyc
         # return 'http://'+urlHost+'/' + strx
-
+        if strx.startswith("/"):
+            return ('https://'+urlHost + strx).strip() 
+        else:
+            return ('https://'+urlHost+'/' + strx).strip() 
 
 with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
     # 写csv
@@ -216,7 +222,6 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     print('=============urlPath带有/\\')
                     continue
                 
-
                 # urlPath 转 完整url
                 urlFull = returnUrl(urlPath)
                 # TODO test
@@ -335,7 +340,10 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 if titles and titles[0] and titles[0].contents:
                     title = titles[0].contents[0]
                 else:
-                    title = '页面标题为空'
+                    # TODO 先通过集合获取标题，没有在默认
+                    title = str(urlMapTitle.get(urlFull));
+                    if len(title) == 0 :
+                        title = '页面标题为空'
 
                 # 写入 csv
                 if page.status_code != 200 :
@@ -362,11 +370,22 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 returnUrlFull = ''
 
                 for item in links:
-                    print('item in links ==href:,  %s:\n ' %
-                          (item.get('href')))
+                    print('item in links ==href:,  %s:\n ' %(item.get('href')))
+                    print('item==', item)
 
                     if item.get('href'):
                         returnUrlFull = returnUrl(item.get('href'))
+                        
+                        
+                        # 获取链接title
+                        # relSoup = BeautifulSoup(item, 'html.parser')
+                        # # print(relSoup.a.contents)
+                        # print('relSoup==', relSoup)
+                        # exit;
+                        
+                        urlTitle = ''
+                        # 构建映射
+                        urlMapTitle[returnUrlFull] = urlTitle
 
                     # 本站点
                     # if returnUrlFull.startswith(urlTarget):
@@ -400,9 +419,10 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                   '\n targetUrlSeedSetTmp======\n', targetUrlSeedSetTmp,
                   )
             
-            # 写日志
-            logFile.write('\n ============检查完成============')
-            logFile.flush()
-            # exit()
+        # 写日志
+        logFile.write('\n ============检查完成1============')
+        logFile.flush()
+        # exit()
+            
 
 print('检查完成')

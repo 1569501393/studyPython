@@ -6,7 +6,9 @@
 from bs4 import BeautifulSoup
 import requests
 
-rel_soup = BeautifulSoup('<p>Back to the <a rel="index">homepage hello world < br > 办事指南</a></p>')
+# str = '<p>Back to the <a rel="index">homepage hello world < br > 办事指南</a></p>'
+str = '<a class="dys_addLink" href="http://www.gov.cn/zhuanti/zggcddescqgdbdh/index.htm" target="_blank"> <img class="shouji10" src="http://www.gov.cn/govweb/xhtml/2019zhuanti/20thCPCNationalCongress/images/20221027xxgcdesdjsclickin.png"/><img class="shouji11" src="http://ysp.www.gov.cn/013582404bd78ad3c016b8fffefe6a9a/top20meeting.jpg"/></a>'
+rel_soup = BeautifulSoup(str)
 # rel_soup = BeautifulSoup('< a target="_blank" title="集成电路布图设计登记审批办事指南" href="/attach/0/d4b9c91154c041a49e7ad653bbfa0cc2.pdf" > <img src="/picture/0/2006101457034528487.png" alt="" > 集成电路布图设计登记审批 < br > 办事指南 < /a >')
 
 
@@ -17,7 +19,7 @@ print("rel_soup.p==")
 print(rel_soup.p)
 print("内容==")
 print(rel_soup.a.contents)
-print(type(rel_soup.a.contents),  ''.join(rel_soup.a.contents))
+# print(type(rel_soup.a.contents),  ''.join(rel_soup.a.contents))
 
 
 
