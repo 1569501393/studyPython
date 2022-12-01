@@ -14,6 +14,7 @@ import requests
 import requests_random_user_agent
 
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from urllib.parse import urlparse
@@ -72,25 +73,24 @@ pageContentType = ''
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0 WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36 SE 2.X MetaSr 1.0'}
 
-
 userAgents = [
- "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
- "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
- "Mozilla/4.0 (compatible; MSIE 7.0; AOL 9.5; AOLBuild 4337.35; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
- "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
- "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 2.0.50727; Media Center PC 6.0)",
- "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)",
- "Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.2; .NET CLR 3.0.04506.30)",
- "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 (Change: 287 c9dfb30)",
- "Mozilla/5.0 (X11; U; Linux; en-US) AppleWebKit/527+ (KHTML, like Gecko, Safari/419.3) Arora/0.6",
- "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
- "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0",
- "Mozilla/5.0 (X11; Linux i686; U;) Gecko/20070322 Kazehakase/0.4.5",
- "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.8) Gecko Fedora/1.9.0.8-1.fc10 Kazehakase/0.5.6",
- "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
- "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.20 (KHTML, like Gecko) Chrome/19.0.1036.7 Safari/535.20",
- "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52",
- "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0",
+    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
+    "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
+    "Mozilla/4.0 (compatible; MSIE 7.0; AOL 9.5; AOLBuild 4337.35; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
+    "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
+    "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 2.0.50727; Media Center PC 6.0)",
+    "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)",
+    "Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 5.2; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.2; .NET CLR 3.0.04506.30)",
+    "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 (Change: 287 c9dfb30)",
+    "Mozilla/5.0 (X11; U; Linux; en-US) AppleWebKit/527+ (KHTML, like Gecko, Safari/419.3) Arora/0.6",
+    "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
+    "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0",
+    "Mozilla/5.0 (X11; Linux i686; U;) Gecko/20070322 Kazehakase/0.4.5",
+    "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.8) Gecko Fedora/1.9.0.8-1.fc10 Kazehakase/0.5.6",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.20 (KHTML, like Gecko) Chrome/19.0.1036.7 Safari/535.20",
+    "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0",
 ]
 
 # 初始目标url
@@ -106,13 +106,13 @@ userAgents = [
 
 targetUrlSeedSet = {urlTarget}
 
-
 # 默认状态 0
 serverResponseStatusCode = 0
 
 # 日志文件
-csvFileName = './storage/link_' + urlHost+ '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
+csvFileName = './storage/link_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
 logFileName = './storage/log_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
+
 
 # 获取链接后缀
 def getLinkSuffix(urlFull):
@@ -125,10 +125,12 @@ def getLinkSuffix(urlFull):
     # exit()
     return linkSuffix
 
+
 # 获取随机 UA
-def getRandomUa() :
+def getRandomUa():
     global userAgents
-    return userAgents[randint(0, len(userAgents)-1)]
+    return userAgents[randint(0, len(userAgents) - 1)]
+
 
 # 获取请求
 
@@ -144,11 +146,11 @@ def getRandomUa() :
 def getHttpRequest(url):
     # global headers
     s = requests.Session()
-    
-    headers = {'user-agent': s.headers['User-Agent'], 'Connection':'close'}
+
+    headers = {'user-agent': s.headers['User-Agent'], 'Connection': 'close'}
     print('===================================headers==========')
     print(headers)
-    
+
     try:
         resGet = requests.get(url, headers=headers, verify=False)
         return resGet
@@ -168,11 +170,13 @@ def getHttpRequest(url):
         print(e)
         return e
 
+
 # 检测字符串是否url
 
 
 def checkIsUrl(strx):
     return strx.startswith("http")
+
 
 # 返回 url
 def returnUrl(strx):
@@ -183,13 +187,14 @@ def returnUrl(strx):
         # # TODO adjyc
         # return 'http://'+urlHost+'/' + strx
         if strx.startswith("/"):
-            return ('https://'+urlHost + strx).strip() 
+            return ('https://' + urlHost + strx).strip()
         else:
-            return ('https://'+urlHost+'/' + strx).strip() 
+            return ('https://' + urlHost + '/' + strx).strip()
 
-with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
+
+with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
     # 写csv
-    with open(csvFileName, 'w',encoding='utf-8-sig',newline='') as csvFile:
+    with open(csvFileName, 'w', encoding='utf-8-sig', newline='') as csvFile:
         fieldnames = ['link', 'text', 'pageWhereFound', 'serverResponse']
         writer = csv.DictWriter(csvFile, fieldnames=fieldnames)
         writer.writeheader()
@@ -208,7 +213,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 # 写日志
                 logFile.write(logContent)
                 logFile.flush()
-                
+
                 # 过滤 javascript 和 mailto
                 # if urlPath.find('javascript') != -1:
                 #     continue
@@ -225,7 +230,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 if '/\\' in urlPath:
                     print('=============urlPath带有/\\')
                     continue
-                
+
                 # urlPath 转 完整url
                 urlFull = returnUrl(urlPath)
                 # TODO test
@@ -233,8 +238,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 # urlFull = 'https://www.cnipa.gov.cn/art/2020/5/26/art_701_14.html'
                 # urlFull = 'http://www.customs.gov.cn/'
                 # urlFull = 'http://36.112.95.124/reexam_out2020New/searchIndexKS.jsp'
-                
-                
+
                 # print(urlPath, urlFull)
                 # exit() 
 
@@ -242,18 +246,17 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 print('%s: 正在访问第 %s 个链接, urlFull:\n %s' %
                       (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()), pageVisitedNum, urlFull))
                 pageVisitedNum += 1
-                
+
                 # TODO 过滤 zip,jpg 等大文件, 加快检查效率
                 # 跳过非 链接后缀 url
                 linkSuffix = getLinkSuffix(urlFull)
 
                 if (linkSuffix in notLinkSuffixSet):
                     continue
-                
-                
+
                 # 休息 0.5 秒
                 # time.sleep(0.5)
-                
+
                 try:
                     page = getHttpRequest(urlFull)
                     # https://www.runoob.com/http/http-content-type.html
@@ -261,14 +264,14 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     # exit()
                     if 'Content-Type' in page.headers:
                         pageContentType = page.headers['Content-Type']
-                        
+
                     # print('page======', page, page.headers['Content-Type'])
                     # print('page======', page, page.headers)
                     # exit()
-                    
+
                     # 跳过非 链接后缀 url
                     # linkSuffix = getLinkSuffix(urlFull)
-                    
+
                     # if (linkSuffix in notLinkSuffixSet):
                     #     continue
                     # print('page======', page, page.headers)
@@ -280,7 +283,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                            (urlFull, str(e.code), e.message)))
                     # 写日志
                     logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
-                                  (urlFull, str(e.code), e.message)))
+                                   (urlFull, str(e.code), e.message)))
                     logFile.flush()
                     continue
                     # pass
@@ -290,19 +293,19 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                            (urlFull, str(e.code), e.message)))
                     # 写日志
                     logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
-                                  (urlFull, str(e.code), e.message)))
+                                   (urlFull, str(e.code), e.message)))
                     logFile.flush()
                     continue
                     # pass
                     # TODO 只解析 utf8
-                except :
+                except:
                     print(('\n异常request urlFull: %s, code: %s, message: %s' %
                            (urlFull, str(500), 'error')))
                     # 写日志
                     logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %
-                                  (urlFull, str(500), 'error')))
+                                   (urlFull, str(500), 'error')))
                     logFile.flush()
-                    
+
                     pageWhereFound = ''
                     writer.writerow(
                         {
@@ -313,7 +316,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                         }
                     )
                     csvFile.flush()
-                    
+
                     continue
                 try:
                     htmlDoc = page.content.decode()
@@ -346,11 +349,11 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 else:
                     # TODO 先通过集合获取标题，没有在默认
                     title = str(urlMapTitle.get(urlFull));
-                    if len(title) == 0 :
+                    if len(title) == 0:
                         title = '页面标题为空'
 
                 # 写入 csv
-                if page.status_code != 200 :
+                if page.status_code != 200:
                     pageWhereFound = ''
                     writer.writerow(
                         {
@@ -361,7 +364,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                         }
                     )
                     csvFile.flush()
-                
+
                 # 判断是否本站点, 非本站点，无需检测子链接
                 if not urlFull.startswith(urlTarget):
                     continue
@@ -374,19 +377,18 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                 returnUrlFull = ''
 
                 for item in links:
-                    print('item in links ==href:,  %s:\n ' %(item.get('href')))
+                    print('item in links ==href:,  %s:\n ' % (item.get('href')))
                     print('item==', item)
 
                     if item.get('href'):
                         returnUrlFull = returnUrl(item.get('href'))
-                        
-                        
+
                         # 获取链接title
                         # relSoup = BeautifulSoup(item, 'html.parser')
                         # # print(relSoup.a.contents)
                         # print('relSoup==', relSoup)
                         # exit;
-                        
+
                         urlTitle = ''
                         # 构建映射
                         urlMapTitle[returnUrlFull] = urlTitle
@@ -394,7 +396,7 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                     # 本站点
                     # if returnUrlFull.startswith(urlTarget):
                     #     urlSetOnPage.add(returnUrlFull)
-                    
+
                     # 非本这点也要验证自身url是否死链
                     urlSetOnPage.add(returnUrlFull)
 
@@ -418,24 +420,22 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
             targetUrlSeedSet = urlSetNotVisit - urlSetVisited
 
             print('\n targetUrlSeedSet====== \n', targetUrlSeedSet,
-                  '\n urlSetNotVisit====== \n', urlSetNotVisit,  
+                  '\n urlSetNotVisit====== \n', urlSetNotVisit,
                   '\n urlSetVisited======\n', urlSetVisited,
                   '\n targetUrlSeedSetTmp======\n', targetUrlSeedSetTmp,
                   )
-            
+
         # 任务结束时间
         taskEndTime = time.time()
         taskRunTime = taskEndTime - taskStartTime
 
         # 写日志
         logFile.write('\n ============检查完成============')
-        logFile.write('\n ============共耗时============ \n  %s s' %(str(taskRunTime)))
-        
+        logFile.write('\n ============共耗时============ \n  %s s' % (str(taskRunTime)))
+
         # logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %(urlFull, str(e.code), e.message)))
         logFile.flush()
         # exit()
-            
 
 print('检查完成')
-print('\n ============共耗时============ \n  %s s' %(str(taskRunTime)))
-
+print('\n ============共耗时============ \n  %s s' % (str(taskRunTime)))
