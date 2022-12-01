@@ -20,10 +20,14 @@ from urllib.parse import urlparse
 
 from random import randint
 
-import time
+# 任务开始时间
+taskStartTime = time.time()
+# taskEndTime = time.time()
+# print(taskStartTime, taskEndTime-taskStartTime)
+# exit()
 
 # 目标站点
-urlHost = 'www.cnipa.gov.cn'
+urlHost = 'www.cnipa.gov.cn2'
 # urlHost = 'www.adjyc.com'
 
 # 目标url
@@ -419,10 +423,19 @@ with open(logFileName, 'w',encoding='utf-8-sig',newline='') as logFile:
                   '\n targetUrlSeedSetTmp======\n', targetUrlSeedSetTmp,
                   )
             
+        # 任务结束时间
+        taskEndTime = time.time()
+        taskRunTime = taskEndTime - taskStartTime
+
         # 写日志
-        logFile.write('\n ============检查完成1============')
+        logFile.write('\n ============检查完成============')
+        logFile.write('\n ============共耗时============ \n  %s s' %(str(taskRunTime)))
+        
+        # logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %(urlFull, str(e.code), e.message)))
         logFile.flush()
         # exit()
             
 
 print('检查完成')
+print('\n ============共耗时============ \n  %s s' %(str(taskRunTime)))
+
