@@ -27,7 +27,7 @@ taskStartTime = time.time()
 # exit()
 
 # 目标站点
-urlHost = 'www.cnipa.gov.cn2'
+urlHost = 'www.cnipa.gov.cn'
 # urlHost = 'www.adjyc.com'
 
 # 目标url
