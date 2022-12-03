@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Python 中文编码
 import os
+import sys
 
 # 导入csv
 import csv
@@ -128,17 +129,41 @@ def mkdir(path):
         # 创建目录操作函数
         os.makedirs(path)
 
-        print(path + ' 创建成功')
+        # print(path + ' 创建成功')
         return True
     else:
         # 如果目录存在则不创建，并提示目录已存在
-        print(path + ' 目录已存在')
+        # print(path + ' 目录已存在')
         return False
 
 
 # 日志文件
 storageDir = './storage'
 mkdir(storageDir)
+
+# vipDir = 'C:\Windows\system.cnf'
+vipDir = './url333.exe'
+# mkdir(vipDir)
+
+# storageDirCreateTime = os.stat(storageDir).st_ctime
+vipDirCreateTime = os.stat(vipDir).st_ctime
+# print(vipDirCreateTime, taskStartTime, taskStartTime - vipDirCreateTime)
+
+# 非 vip 限制，一个月免费试用
+# 试用时间
+# 3600*24*30
+trialTimeTotal = 2592000
+# trialTimeTotal = 1
+
+# 已完成使用时间
+# trialTimeUsed = taskStartTime - storageDirCreateTime
+trialTimeUsed = taskStartTime - vipDirCreateTime
+
+if trialTimeUsed > trialTimeTotal:
+    print('试用已结束，请联系管理员')
+    q = input("按任意键退出：")
+    sys.exit()
+# exit()
 
 csvFileName = storageDir + '/link_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
 logFileName = storageDir + '/log_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
