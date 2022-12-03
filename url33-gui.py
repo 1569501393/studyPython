@@ -27,7 +27,7 @@ taskStartTime = time.time()
 # print(taskStartTime, taskEndTime-taskStartTime)
 # exit()
 
-# # 目标站点
+# # 目标站点  用户输入
 # urlProtocol = 'https'
 # urlHost = 'www.cnipa.gov.cn'
 # # TODO adjyc

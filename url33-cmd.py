@@ -27,16 +27,17 @@ taskStartTime = time.time()
 # print(taskStartTime, taskEndTime-taskStartTime)
 # exit()
 
-# # 目标站点
-# urlProtocol = 'https'
-# urlHost = 'www.cnipa.gov.cn'
+# # 目标站点 固定
+urlProtocol = 'https'
+urlHost = 'www.cnipa.gov.cn'
 # # TODO adjyc
 # urlProtocol = 'http'
 # urlHost = 'www.adjyc.com'
-urlProtocol = input("目标站点协议,如 https:") or 'https'
-print('目标站点协议============' + urlProtocol)
-urlHost = input("目标站点url：如 www.cnipa.gov.cn:") or 'www.cnipa.gov.cn'
-print('目标站点url============' + urlHost)
+# urlProtocol = input("目标站点协议,如 https:") or 'https'
+# print('目标站点协议============' + urlProtocol)
+# urlHost = input("目标站点url：如 www.cnipa.gov.cn:") or 'www.cnipa.gov.cn'
+# print('目标站点url============' + urlHost)
+
 # 目标url
 urlTarget = urlProtocol + '://' + urlHost
 print('目标站点============' + urlTarget)
@@ -441,4 +442,4 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
 print('检查完成')
 print('\n ============共耗时============ \n  %s s' % (str(taskRunTime)))
 
-q = input("按任意键退出：")
+# q = input("按任意键退出：")
