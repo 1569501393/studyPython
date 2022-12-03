@@ -142,12 +142,12 @@ storageDir = './storage'
 mkdir(storageDir)
 
 # vipDir = 'C:\Windows\system.cnf'
-vipDir = './url333.exe'
+vipDir = './url33.exe'
 # mkdir(vipDir)
 
 # storageDirCreateTime = os.stat(storageDir).st_ctime
 vipDirCreateTime = os.stat(vipDir).st_ctime
-# print(vipDirCreateTime, taskStartTime, taskStartTime - vipDirCreateTime)
+print(vipDirCreateTime, taskStartTime, taskStartTime - vipDirCreateTime)
 
 # 非 vip 限制，一个月免费试用
 # 试用时间
