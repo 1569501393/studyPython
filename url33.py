@@ -185,6 +185,9 @@ def checkIsUrl(strx):
 def returnUrl(strx):
     if strx.startswith("http"):
         return strx.strip()
+    # //www.baidu.com/duty
+    elif strx.startswith("//"):
+        return (urlProtocol + ':' + strx).strip()
     elif strx.startswith("/"):
         return (urlProtocol + '://' + urlHost + strx).strip()
     elif strx.startswith("./"):
