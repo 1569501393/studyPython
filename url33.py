@@ -109,9 +109,39 @@ targetUrlSeedSet = {urlTarget}
 # 默认状态 0
 serverResponseStatusCode = 0
 
+
+# 创建目录
+def mkdir(path):
+    # 去除首位空格
+    path = path.strip()
+    # 去除尾部 \ 符号
+    path = path.rstrip("\\")
+
+    # 判断路径是否存在
+    # 存在     True
+    # 不存在   False
+    isExists = os.path.exists(path)
+
+    # 判断结果
+    if not isExists:
+        # 如果不存在则创建目录
+        # 创建目录操作函数
+        os.makedirs(path)
+
+        print(path + ' 创建成功')
+        return True
+    else:
+        # 如果目录存在则不创建，并提示目录已存在
+        print(path + ' 目录已存在')
+        return False
+
+
 # 日志文件
-csvFileName = './storage/link_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
-logFileName = './storage/log_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
+storageDir = './storage'
+mkdir(storageDir)
+
+csvFileName = storageDir + '/link_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.csv'
+logFileName = storageDir + '/log_' + urlHost + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.log'
 
 
 # 获取链接后缀
@@ -155,7 +185,8 @@ def getHttpRequest(url):
     print(headers)
 
     try:
-        resGet = requests.get(url, headers=headers, verify=False)
+        # resGet = requests.get(url, headers=headers, verify=False, proxies=None, timeout=3)
+        resGet = requests.get(url, headers=headers, verify=False, proxies=None, timeout=3)
         return resGet
     except requests.exceptions.HTTPError as e:
         # TODO debug
@@ -384,6 +415,11 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
                     print('item in links ==href:,  %s:\n ' % (item.get('href')))
                     print('item==', item)
 
+                    # 写日志
+                    logFile.write('\n item in links ==href:,  %s:\n ' % (item.get('href')))
+                    logFile.write('item==,  %s:\n' % item)
+                    logFile.flush()
+
                     if item.get('href'):
                         returnUrlFull = returnUrl(item.get('href'))
 
@@ -433,15 +469,18 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
         taskEndTime = time.time()
         taskRunTime = taskEndTime - taskStartTime
 
+        # strftime("%H:%M:%S", gmtime(5555))
+        taskRunTimeFormat = time.strftime("%H:%M:%S", time.gmtime(taskRunTime))
+
         # 写日志
         logFile.write('\n ============检查完成============')
-        logFile.write('\n ============共耗时============ \n  %s s' % (str(taskRunTime)))
+        logFile.write('\n ============共耗时============ \n  %s' % taskRunTimeFormat)
 
         # logFile.write(('\n异常request urlFull: %s, code: %s, message: %s' %(urlFull, str(e.code), e.message)))
         logFile.flush()
         # exit()
 
 print('检查完成')
-print('\n ============共耗时============ \n  %s s' % (str(taskRunTime)))
+print('\n ============共耗时============ \n  %s' % taskRunTimeFormat)
 
 q = input("按任意键退出：")
