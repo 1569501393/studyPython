@@ -50,8 +50,18 @@ python3 ./url3.py
 WDScanner平台目前实现了如下功能：分布式web漏洞扫描、客户管理、漏洞定期扫描、子域名枚举、端口扫描、网站爬虫、暗链检测、坏链检测、网站指纹搜集、专项漏洞检测、代理搜集及部署等功能。
 <https://github.com/TideSec/WDScanner>
 
+### TODO
+后续完善思路：
+1.有标题就获取，没有的就取父页面对应标签，无标签或不好取值，就用  无法获取 替代即可。基本思路。
+2.生成exe可执行文件，这样在windows下直接双击即可跑起来，然后客户自己当前目录生成出excel文件也很方便  1
 
 ### 修改点
+#### 生成 exe 文件
+https://www.cnblogs.com/the3times/p/12386007.html
+
+#### http
+添加 urlProtocol
+
 #### 计算耗时
 
 #### 去除 // 以及 空格

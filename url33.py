@@ -27,18 +27,18 @@ taskStartTime = time.time()
 # print(taskStartTime, taskEndTime-taskStartTime)
 # exit()
 
-# 目标站点
-urlHost = 'www.cnipa.gov.cn'
+# # 目标站点
+# urlProtocol = 'https'
+# urlHost = 'www.cnipa.gov.cn'
+# # TODO adjyc
+# urlProtocol = 'http'
 # urlHost = 'www.adjyc.com'
+urlProtocol = input("目标站点协议,如 https:") or 'https'
+urlHost = input("目标站点url：如 www.cnipa.gov.cn:") or 'www.cnipa.gov.cn'
 
 # 目标url
-urlTarget = 'https://' + urlHost
-# urlTarget = 'http://' + urlHost
-
-# TODO test, 同时配合修改 170 行左右 returnUrl: https => http
-# urlHost = 'www.adjyc.com'
-# urlTarget = 'http://' + urlHost
-
+urlTarget = urlProtocol + '://' + urlHost
+print('目标站点============' + urlTarget)
 
 # 存放还没访问的url
 urlSetNotVisit = set()
@@ -61,8 +61,7 @@ urlMapTitle = {}
 pageVisitedNum = 0
 
 # 非 链接后缀 url
-notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc',
-                    '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
+notLinkSuffixSet = {'.jpg', '.zip', '.png', '.gif', '.doc', '.docx', '.ppt', '.pptx', '.pdf', '.rar', '.gz', }
 
 pageContentType = ''
 
@@ -182,14 +181,12 @@ def checkIsUrl(strx):
 def returnUrl(strx):
     if strx.startswith("http"):
         return strx.strip()
+    elif strx.startswith("/"):
+        return (urlProtocol + '://' + urlHost + strx).strip()
+    elif strx.startswith("./"):
+        return (urlProtocol + '://' + urlHost + strx[1:]).strip()
     else:
-        # return 'https://'+urlHost+'/' + strx
-        # # TODO adjyc
-        # return 'http://'+urlHost+'/' + strx
-        if strx.startswith("/"):
-            return ('https://' + urlHost + strx).strip()
-        else:
-            return ('https://' + urlHost + '/' + strx).strip()
+        return (urlProtocol + '://' + urlHost + '/' + strx).strip()
 
 
 with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
@@ -199,7 +196,7 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
         writer = csv.DictWriter(csvFile, fieldnames=fieldnames)
         writer.writeheader()
 
-        while (targetUrlSeedSet):
+        while targetUrlSeedSet:
             for urlPath in targetUrlSeedSet:
                 logContent = ('\n %s: 正在访问第 %s 个链接, urlPath:\n %s' %
                               (
@@ -251,7 +248,7 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
                 # 跳过非 链接后缀 url
                 linkSuffix = getLinkSuffix(urlFull)
 
-                if (linkSuffix in notLinkSuffixSet):
+                if linkSuffix in notLinkSuffixSet:
                     continue
 
                 # 休息 0.5 秒
@@ -276,7 +273,7 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
                     #     continue
                     # print('page======', page, page.headers)
                     # exit()
-                    if (not pageContentType.startswith("text/html")):
+                    if not pageContentType.startswith("text/html"):
                         continue
                 except requests.exceptions.HTTPError as e:
                     print(('\n异常request urlFull: %s, code: %s, message: %s' %
@@ -439,3 +436,5 @@ with open(logFileName, 'w', encoding='utf-8-sig', newline='') as logFile:
 
 print('检查完成')
 print('\n ============共耗时============ \n  %s s' % (str(taskRunTime)))
+
+q = input("按任意键退出：")
