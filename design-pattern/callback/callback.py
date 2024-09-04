@@ -37,6 +37,7 @@ def skateboarding():
 def testSkill():
     helen = Employee("Helen")
     helen.doPerformance(sing)
+    helen.doPerformance(joke)
     frank = Employee("Frank")
     frank.doPerformance(dling)
     jacky = Employee("Jacky")
